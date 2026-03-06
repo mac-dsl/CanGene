@@ -5,7 +5,11 @@ import os
 import pandas as pd
 import subprocess
 import sys
+import arff
 
+from statsmodels.tsa.seasonal import STL
+import matplotlib.pyplot as plt
+from scipy.interpolate import interp1d
 
 class DriftGenerator:
 
@@ -407,3 +411,94 @@ class DriftGenerator:
             stream_data = f.read()
             f.seek(0)
             f.write('\n'.join(stream_info) + '\n' + stream_data)
+
+class TimeSeriesDrifter:
+    def __init__(self, period):
+        self.period = period
+        
+    def transform(self, data, hue_shift=0.0, saturation_scale=1.0, value_scale=1.0, k_f=1):
+        """
+        hue_shift: 0~2pi, Between Seasonal and Residual
+        saturation_scale: Between Trend and (S, R)
+        value_scale: Scaling overall waveform
+        """
+        # 1. STL Decomposition
+        stl = STL(data, period=self.period, robust=True)
+        res = stl.fit()
+        T, S, R = res.trend, res.seasonal, res.resid
+        
+        # 2. Convert to Spherical Coordinates (r, theta, phi)
+        # r: Magnitude, theta: Trend vs Others, phi: Seasonal vs Residual
+        r = np.sqrt(T**2 + S**2 + R**2)
+        theta = np.arccos(T / (r + 1e-9))  # Trend 비중
+        phi = np.arctan2(R, S)             # Seasonal vs Residual 관계 (Hue 역할)
+        
+        # 3. Apply Transformations (Drift Simulation)
+        # Hue Shift: 위상을 회전시켜 Seasonal과 Residual의 관계를 비틂 (Shape 변화)
+        new_phi = phi + hue_shift*np.pi
+        
+        # Saturation: Far from the Trend
+        new_theta = theta * saturation_scale
+        # print('theta: ', theta, new_theta)
+        new_theta = np.clip(new_theta, 0, np.pi)
+        
+        # Value: Energy value, R
+        new_r = r * value_scale
+        
+        # 4. Convert back to Cartesian (T', S', R')
+        new_T = new_r * np.cos(new_theta)
+        new_S = new_r * np.sin(new_theta) * np.cos(new_phi)
+        new_R = new_r * np.sin(new_theta) * np.sin(new_phi)
+        
+        # 5. Recomposition
+        new_data = new_T + new_S + new_R
+        
+        if k_f!= 1:
+            new_data = self.frequency_scaling(new_data, k_f)
+
+        return new_data
+    
+    def frequency_scaling(self, data, k_f):
+        """
+        data: 1-D time sequence
+        k_f: frequency scaling parameter
+        """
+        n = len(data)
+        original_indices = np.arange(n)
+
+        new_indices = np.arange(n) * k_f
+
+        f_interp = interp1d(original_indices, data, kind='linear', fill_value='extrapolate')
+
+        return f_interp(new_indices)
+
+    def save_arff(self, data, label, dir, filename):
+        """
+        Save transformed data into .arff format
+        """
+        df = pd.DataFrame({
+            'data':np.array(data).reshape(-1),
+            'anomaly_labels': np.array(label).reshape(-1)
+        })
+
+        arff_data = {
+            'description': '',
+            'relation': filename,
+            'attributes': [(col, 'NUMERIC') if df[col].dtype !='object' else (col, 'STRING') for col in df.columns],
+            'data':df.values.tolist()
+        }
+
+        with open(f'{dir}/{filename}_mod.arff', 'w') as f:
+            arff.dump(arff_data, f)
+        
+        return f'{dir}/{filename}_mod.arff'
+
+    def modulate_stream(self, stream: Stream, v=1, o=1, m=0, p=1):
+        # new_stream = stream.copy()
+        filename = stream.filename
+        data = stream.data
+        label = stream.anomaly_labels
+
+        new_data = self.transform(data, m, o, v, p)
+        print(self.save_arff(new_data, label, stream.path, f'{filename}_v{v}_o{o}_m{m}'))
+
