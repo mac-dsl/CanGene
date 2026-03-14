@@ -1,7 +1,9 @@
-# CanGene: A Concept Drift and Anomaly Data Generator
+# Synthetic Data Generation for Anomaly and Concept Drift co-Exploration
 
 ## References of this repository
-- https://moa.cms.waikato.ac.nz
+- TSB-UAD (https://github.com/thedatumorg/TSB-UAD.git) for ECG data and NormA code
+- DAMP (https://sites.google.com/view/discord-aware-matrix-profile/documentation) Matlab Code
+- MOA (https://moa.cms.waikato.ac.nz), time-series drift generation
 
 
 ## References
@@ -27,15 +29,17 @@ pip install -r requirements.txt
 ```
 
 ## Benchmark
-All are datasets and time series are stored in ./data. We describe below the different types of datasets used in our benchmark.
-1. ECG
+All datasets and time series are stored in ./data. We describe below the different types of datasets used in our benchmark.
+1. ECG (./data/benchmark)
 - The ECG dataset is a standard electrocardiogram dataset which comes from the MIT-BIH Arrhythmia database, where anomalies represent ventricular premature contractions. (Downloaded from https://github.com/TheDatumOrg/TSB-UAD/tree/main)
+- Drift injected data for the experiments are stored under ./data/{dir}, dir=[test, test_mod]
   
 2. Weather data
 - The Weather dataset is a hourly, geographically aggregated temperature and radiation information in Europe originated from the NASA MERRA-2. The original Weather dataset contained timestamp, each country's temperature, and radiation information from 1960-to-2020, but for the demo, we separated each country's temperature data from 2017-to-2020 and saved them into '.arff' files in the repository. (From Open Power System Data, https://doi.org/10.25832/weather_data/2020-09-16:)
+- Drift injected data for the experiments are stored under ./data/{dir}, dir=[test_weather, test_weather_mod]
 
 ## Usage
-We include several demo. file to test the experiments. 
+We include several demo. file to test the experiments.  
 
 1. Weather_Test.ipynb
 - This is the exactly same test file for the draft which is introduced in 'References'. All the parameters should be described in 'demo_config.yaml' file, so users can augment and change it based on purpose.
