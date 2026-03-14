@@ -4,11 +4,11 @@ source_files:
   - 'MBA_ECG14046_data_20.arff'
   - 'MBA_ECG14046_data_21.arff'
 ## Drift params
-moa_path: '../moa-release-2023.04.0/lib'
+moa_path: '../../moa-release-2023.04.0/lib'
 drift_dir: './data/synthetic'
 drift_params:
   length: 114950
-  n_drift: 20
+  n_drift: 15
   p_drift: 0.35
   p_before: 0.5
   sub_dir: 'demo'

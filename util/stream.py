@@ -139,7 +139,8 @@ class Stream:
             ax.plot(
                np.arange(anom_start, min(len(self.data),anom_end+1)),
                 self.data[anom_start: min(len(self.data),anom_end+1)],
-                f"{marker}r", linewidth=3
+                # f"{marker}r", linewidth=3
+                f"{marker}r", linewidth=2
             )
         if len(title) > 0:
             ax.set_title(title, size=size)
