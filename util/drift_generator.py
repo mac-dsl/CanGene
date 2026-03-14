@@ -286,10 +286,13 @@ class DriftGenerator:
         content = []
         output_files = []
         # Extract content from ARFF file
+        print(filename)
         with open(filepath, 'r') as input_file:
             for (i, line) in enumerate(input_file):
                 if i > 7:
                     num_vals = line.strip().split(',')[:-1]
+                    # print('line:', line)
+                    # print('vals: ', num_vals)
                     num_vals = [float(n) for n in num_vals]
                     newline = f"{num_vals[0]},{num_vals[1]},\n"
                     content.append(newline)
@@ -476,20 +479,39 @@ class TimeSeriesDrifter:
         """
         Save transformed data into .arff format
         """
+
         df = pd.DataFrame({
-            'data':np.array(data).reshape(-1),
-            'anomaly_labels': np.array(label).reshape(-1)
+            'att1': np.array(data).reshape(-1),
+            'class': np.array(label).reshape(-1)
         })
 
-        arff_data = {
-            'description': '',
-            'relation': filename,
-            'attributes': [(col, 'NUMERIC') if df[col].dtype !='object' else (col, 'STRING') for col in df.columns],
-            'data':df.values.tolist()
-        }
-
         with open(f'{dir}/{filename}_mod.arff', 'w') as f:
-            arff.dump(arff_data, f)
+            f.write(f"@relation './{filename}'\n\n")
+
+            f.write("@attribute att1 numeric\n")
+            f.write("@attribute class {1.0, 0.0}\n\n")
+
+            f.write("@data\n\n")
+
+            for _, row in df.iterrows():
+                f.write(f"{row['att1']:.3f},{row['class']},\n")
+
+        # df = pd.DataFrame({
+            # 'data':np.array(data).reshape(-1),
+            # 'anomaly_labels': np.array(label).reshape(-1)
+        # })
+        
+        
+# 
+        # arff_data = {
+            # 'description': '',
+            # 'relation': filename,
+            # 'attributes': [(col, 'NUMERIC') if df[col].dtype !='object' else (col, 'STRING') for col in df.columns],
+            # 'data':df.values.tolist()
+        # }
+# 
+        # with open(f'{dir}/{filename}_mod.arff', 'w') as f:
+            # arff.dump(arff_data, f)
         
         return f'{dir}/{filename}_mod.arff'
 
@@ -497,8 +519,11 @@ class TimeSeriesDrifter:
         # new_stream = stream.copy()
         filename = stream.filename
         data = stream.data
-        label = stream.anomaly_labels
+        label = stream.anomaly_labels.reshape(-1)
+        anom_idx = np.where(label)
 
         new_data = self.transform(data, m, o, v, p)
-        print(self.save_arff(new_data, label, stream.path, f'{filename}_v{v}_o{o}_m{m}'))
+        label_idx = self.transform(np.arange(len(data)), m, o, v, p)
+
+        print(self.save_arff(new_data, label, stream.path, f'{filename}_v{v}_o{o}_m{m}_p{p}'))
 

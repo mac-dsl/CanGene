@@ -1,5 +1,19 @@
 %  Source Streams:
 %    0:MBA_ECG14046_data_20.arff
+%    1:MBA_ECG14046_data_21.arff
+%  Stream Order: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
+%  Drift Positions: [9858, 28799, 44232, 54846, 66711, 80562, 85311, 101981, 108854, 128091, 134680, 158258]
+%  Drift Widths: [2725, 5145, 4476, 4225, 4621, 2238, 4908, 2896, 3750, 67, 719, 4456]
+%  Drift Before: [False, False, True, True, True, False, True, False, True, True, False, False]
+%  Source Streams:
+%    0:MBA_ECG14046_data_20.arff
+%    1:MBA_ECG14046_data_21.arff
+%  Stream Order: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
+%  Drift Positions: [8376, 17107, 35434, 56565, 70369, 79536, 93575, 107341, 115727, 126076, 134884, 140114]
+%  Drift Widths: [91, 3406, 5958, 7116, 2546, 187, 3360, 5267, 166, 4096, 1499, 6535]
+%  Drift Before: [True, False, False, False, False, False, True, True, True, True, False, True]
+%  Source Streams:
+%    0:MBA_ECG14046_data_20.arff
 %    1:MBA_ECG14046_data_21_run.arff
 %  Stream Order: [0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1, 0]
 %  Drift Positions: [8607, 12887, 22464, 28331, 39557, 45459, 53418, 66409, 84976, 91694, 106460, 129444]

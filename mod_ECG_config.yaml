@@ -1,0 +1,14 @@
+source_dir: './data/benchmark/ECG'
+## If you want to use other source files as a stream, you can fill in filenames below.
+source_files: 
+  - 'MBA_ECG803_data.arff'
+  - 'MBA_ECG805_data.arff'
+## Drift params
+moa_path: '../../moa-release-2023.04.0/lib'
+drift_dir: './data/synthetic'
+drift_params:
+  length: 114950
+  n_drift: 15
+  p_drift: 0.35
+  p_before: 0.5
+  sub_dir: 'demo'
